@@ -5,30 +5,34 @@ import java.util.Scanner;
 public class Prettifier {
 
     public static void main(String[] args){
-        String[] Months = {"Jan", "Feb", "Mar", "Apr", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+        String[] Months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
         try{
             File myObj = new File("input.txt");
             Scanner myReader = new Scanner(myObj);
             while (myReader.hasNextLine()){
                 String data = myReader.nextLine();
 
-                int number =  data.indexOf("T12");
-                String date = data.substring(number +4, (data.length() - 1));
 
-                if(data.contains("T12")){
+
+                if(data.contains("T12") && !data.contains("D(")){
+
                     // System.out.println(data);
                     // System.out.println(date);
-                    String time = date.substring(11, 16);
+                    int number =  data.indexOf("T12");
+                    String date = data.substring(number +4, (data.length() - 1));
+                    date = date.trim();
+
+                    
 
                     int hours = Integer.parseInt(date.substring(11, 13));
                     String minutes = date.substring(14, 16);
                     String hoursWithEnding = "";
-                    // System.out.println(time);
                     if(hours > 12){
                         hours = hours - 12;
                         hoursWithEnding = "0" + hours + ":" + minutes+ "PM";
                     } else{
-                        hoursWithEnding = "0" + hours + ":" + minutes+ "AM";
+                        String hours2 = date.substring(11, 13);
+                        hoursWithEnding = hours2 + ":" + minutes+ "AM";
                     }
 
                     // System.out.println(hoursWithEnding);
@@ -37,51 +41,69 @@ public class Prettifier {
                     String lastChar = date.substring(date.length()-1);
 
 
+
                     if(lastChar.equals("Z")){
                         offset = "+00:00";
-                    } else if(lastChar != "Z"){
+                    } else if(!lastChar.equals("Z")){
                         offset = date.substring( date.length() -6, date.length());
                     }
 
-                    String answer = hoursWithEnding + " " + "(" + offset + ")";
+
+
+
+                    String answer = hoursWithEnding + " " + "(" + offset + ")" ;
                     System.out.println(answer);
 
 
 
-                }else if (data.contains("T24")) {
+                }else if (data.contains("T24") && !data.contains("D(")) {
+                    int number =  data.indexOf("T24");
+                    String date = data.substring(number +4, (data.length() - 1));
+                    date = date.trim();
+
                     // System.out.println(data);
-                    // System.out.println(date);
-
-                    String hours = date.substring(15, 17);
-                    String minutes = date.substring(18, 20);
-                    String hoursWithEnding = "";
-                    // System.out.println(time);
 
 
-                        hoursWithEnding = hours + ":" + minutes+ "PM";
-
-                        hoursWithEnding =  hours + ":" + minutes+ "AM";
-
-                    // System.out.println(hoursWithEnding);
-
-                    String offset = "";  
+                    
+                    String offset = ""; 
+                    String hours = "";
                     String lastChar = date.substring(date.length()-1);
+
+                    
 
 
                     if(lastChar.equals("Z")){
                         offset = "+00:00";
-                    } else if(lastChar != "Z"){
+                        hours = date.substring(11, 16);
+                    } else if(!lastChar.equals("Z")){
+                        hours = date.substring(11, 16);
                         offset = date.substring( date.length() -6, date.length());
                     }
 
-                    String answer = hoursWithEnding + " " + "(" + offset + ")";
+
+                    
+                    // System.out.println(time);
+
+                    // System.out.println(hoursWithEnding);
+
+
+                    String answer = hours + " " + "(" + offset + ")";
                     System.out.println(answer);
 
                 }else if(data.contains("D(")){
-                    System.out.println(date);
-                    String day = date.substring(date.length());
-                    String month = "";
-                    String year = "";
+                    int number =  data.indexOf("D(");
+
+                    String date = data.substring(number +2, (data.length() - 1));
+                    String day = date.substring(8, 10);
+
+                    String month = Months[Integer.parseInt(date.substring(5, 7)) - 1];
+                    // System.out.println(month);
+                    String year = date.substring(0, 4);
+
+
+                    String answer = day + " " + month + " " + year;
+                    System.out.println(answer);
+
                     
 
                 }else{

@@ -1,5 +1,9 @@
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Scanner;
 
 public class Prettifier {
@@ -7,10 +11,10 @@ public class Prettifier {
     public static void main(String[] args){
 
         //arguments
-        for (String s: args){
-            System.out.println(s);
-        }
-        System.out.println(args.length);
+        // for (String s: args){
+        //     System.out.println(s);
+        // }
+        // System.out.println(args.length);
         String[] Months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
         
         try{
@@ -29,8 +33,6 @@ public class Prettifier {
                     int number =  data.indexOf("T12");
                     String date = data.substring(number +4, (data.length() - 1));
 
-
-                    
 
                     int hours = Integer.parseInt(date.substring(11, 13));
                     String minutes = date.substring(14, 16);
@@ -71,13 +73,10 @@ public class Prettifier {
 
                     // System.out.println(data);
 
-
                     
                     String offset = ""; 
                     String hours = "";
                     String lastChar = date.substring(date.length()-1);
-
-                    
 
 
                     if(lastChar.equals("Z")){
@@ -88,8 +87,6 @@ public class Prettifier {
                         offset = date.substring( date.length() -6, date.length());
                     }
 
-
-                    
                     // System.out.println(time);
 
                     // System.out.println(hoursWithEnding);
@@ -146,12 +143,23 @@ public class Prettifier {
         if(data.charAt(firstHashtag +1 ) == '#'){
             //ICAO
 
-            firstAirportCode = data.substring(firstHashtag +2, firstHashtag + 6 );
+            firstAirportCode = data.substring(firstHashtag , firstHashtag + 6 );
+            String firstAirportCodeWithOutH = firstAirportCode.substring(2, 6);
+            System.out.println(firstAirportCodeWithOutH);
+            String answers =  readFile(firstAirportCodeWithOutH);
+            System.out.println(answers);
+            FileWriter(answers);
+
 
         } else {
             // IATA
 
-            firstAirportCode = data.substring(firstHashtag +1, firstHashtag + 4 );
+            firstAirportCode = data.substring(firstHashtag , firstHashtag + 4 );
+            String firstAirportCodeWithOutH = firstAirportCode.substring(1, 4);
+            System.out.println(firstAirportCodeWithOutH);
+            String answers =  readFile(firstAirportCodeWithOutH);
+            System.out.println(answers);
+            FileWriter(answers);
 
         }
         // and second #
@@ -159,23 +167,74 @@ public class Prettifier {
             //ICAO
 
 
-            secondAirportCode = data.substring(secondhashtag +2, secondhashtag + 6 );
+            secondAirportCode = data.substring(secondhashtag , secondhashtag + 6 );
+
+            String secondAirportCodeWithOutH = secondAirportCode.substring(2, 6);
+            String answers =  readFile(secondAirportCodeWithOutH);
+            System.out.println(answers);
+            FileWriter(answers);
+
+
 
         } else {
             //IATA
 
 
-            secondAirportCode = data.substring(secondhashtag +1, secondhashtag + 4 );
+            secondAirportCode = data.substring(secondhashtag , secondhashtag + 4 );
+
+            String secondAirportCodeWithOutH = secondAirportCode.substring(1, 4);
+            String answers = readFile(secondAirportCodeWithOutH);
+            FileWriter(answers);
+
         }
 
-        System.out.println(firstAirportCode);
-        System.out.println(secondAirportCode);
 
+    }
 
+    public static String readFile(String searchTerm){
 
+        String filepath = "airport-lookup.csv";
 
-  
+        BufferedReader reader = null;
 
+        String line = "";
+
+        try{
+            reader = new BufferedReader(new FileReader(filepath));
+
+            while((line = reader.readLine()) !=null){
+                String[] row = line.split(",");
+
+                if(row[3].equals(searchTerm)  || row[4].equals(searchTerm)){
+                    System.out.println("found it");
+                    return row[0];
+                    
+                }
+
+            }
+        
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        } finally{
+            if(reader != null){
+                try{
+                    reader.close();
+                }catch(IOException e){
+                    e.printStackTrace();
+                }
+            }
+        }
+        return null;
+    }
+    public static void FileWriter (String row ){
+        try{
+            FileWriter writer = new FileWriter("output.txt");
+            writer.write(row + "\n");
+            writer.close();
+        }catch(IOException e){
+            e.printStackTrace();
+        }
     }
 
 }

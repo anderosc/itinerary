@@ -5,12 +5,20 @@ import java.util.Scanner;
 public class Prettifier {
 
     public static void main(String[] args){
+
+        //arguments
+        for (String s: args){
+            System.out.println(s);
+        }
+        System.out.println(args.length);
         String[] Months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+        
         try{
             File myObj = new File("input.txt");
             Scanner myReader = new Scanner(myObj);
             while (myReader.hasNextLine()){
                 String data = myReader.nextLine();
+                data = data.trim();
 
 
 
@@ -20,7 +28,7 @@ public class Prettifier {
                     // System.out.println(date);
                     int number =  data.indexOf("T12");
                     String date = data.substring(number +4, (data.length() - 1));
-                    date = date.trim();
+
 
                     
 
@@ -104,7 +112,11 @@ public class Prettifier {
                     String answer = day + " " + month + " " + year;
                     System.out.println(answer);
 
-                    
+                
+                }else if(data.contains("#")  ){
+                    airpotCode(data);
+
+
 
                 }else{
                     System.out.println("dont have");
@@ -116,6 +128,54 @@ public class Prettifier {
         } catch (FileNotFoundException e){
             System.out.println("errrrror");
         }
+    }
+
+    public static void airpotCode(String data){
+        // IATA # followed by three letters
+        //ICAO ## followed by four letters
+
+        int firstHashtag = data.indexOf("#");
+        // String otherHalf = data.substring(firstHashtag +1 , data.length());
+        int secondhashtag = data.indexOf("#", firstHashtag + 2);
+
+        String firstAirportCode = "";
+        String secondAirportCode = "";
+
+
+        //lets find if first # is IATA or ICAO code
+        if(data.charAt(firstHashtag +1 ) == '#'){
+            //ICAO
+
+            firstAirportCode = data.substring(firstHashtag +2, firstHashtag + 6 );
+
+        } else {
+            // IATA
+
+            firstAirportCode = data.substring(firstHashtag +1, firstHashtag + 4 );
+
+        }
+        // and second #
+        if(data.charAt(secondhashtag +1 ) == '#'){
+            //ICAO
+
+
+            secondAirportCode = data.substring(secondhashtag +2, secondhashtag + 6 );
+
+        } else {
+            //IATA
+
+
+            secondAirportCode = data.substring(secondhashtag +1, secondhashtag + 4 );
+        }
+
+        System.out.println(firstAirportCode);
+        System.out.println(secondAirportCode);
+
+
+
+
+  
+
     }
 
 }

@@ -207,6 +207,13 @@ public class Prettifier {
 
                 if(row[3].equals(searchTerm)  || row[4].equals(searchTerm)){
                     System.out.println("found it");
+                    System.out.println(row[0]);
+
+                    if(row[0].contains("�")){
+                        System.out.println("yessss");
+                        System.out.println(row[0]);
+                        return searchTerm;
+                    }
                     return row[0];
                     
                 }

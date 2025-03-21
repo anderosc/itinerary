@@ -1,4 +1,5 @@
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -7,6 +8,7 @@ import java.io.IOException;
 import java.util.Scanner;
 
 public class Prettifier {
+    public static boolean airportLookupMalformed = false;
 
     public static void main(String[] args){
 
@@ -16,6 +18,7 @@ public class Prettifier {
         // }
         // System.out.println(args.length);
         String[] Months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+        
         
         try{
             File myObj = new File("input.txt");
@@ -210,9 +213,9 @@ public class Prettifier {
                     System.out.println(row[0]);
 
                     if(row[0].contains("�")){
-                        System.out.println("yessss");
-                        System.out.println(row[0]);
-                        return searchTerm;
+                        System.out.println("Airport lookup malformed");
+                        airportLookupMalformed = true;
+                        break;
                     }
                     return row[0];
                     
@@ -235,10 +238,16 @@ public class Prettifier {
         return null;
     }
     public static void FileWriter (String row ){
+        if(airportLookupMalformed == true){
+            return;
+        }
         try{
-            FileWriter writer = new FileWriter("output.txt");
-            writer.write(row + "\n");
-            writer.close();
+            FileWriter fw = new FileWriter("output.txt");
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(row );
+            bw.newLine();
+            bw.close();
+            fw.close();
         }catch(IOException e){
             e.printStackTrace();
         }

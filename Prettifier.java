@@ -66,6 +66,8 @@ public class Prettifier {
 
                     String answer = hoursWithEnding + " " + "(" + offset + ")" ;
                     System.out.println(answer);
+                    FileWriter(answer);
+
 
 
 
@@ -97,6 +99,8 @@ public class Prettifier {
 
                     String answer = hours + " " + "(" + offset + ")";
                     System.out.println(answer);
+                    FileWriter(answer);
+
 
                 }else if(data.contains("D(")){
                     int number =  data.indexOf("D(");
@@ -111,6 +115,8 @@ public class Prettifier {
 
                     String answer = day + " " + month + " " + year;
                     System.out.println(answer);
+                    FileWriter(answer);
+
 
                 
                 }else if(data.contains("#")  ){
@@ -242,7 +248,7 @@ public class Prettifier {
             return;
         }
         try{
-            FileWriter fw = new FileWriter("output.txt");
+            FileWriter fw = new FileWriter("output.txt", true);
             BufferedWriter bw = new BufferedWriter(fw);
             bw.write(row );
             bw.newLine();

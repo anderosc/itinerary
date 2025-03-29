@@ -35,6 +35,8 @@ public class Prettifier {
                     // System.out.println(date);
                     int number =  data.indexOf("T12");
                     String date = data.substring(number +4, (data.length() - 1));
+                    String replaceable = data.substring(number, data.length());
+                    // System.out.println(replaceable);
 
 
                     int hours = Integer.parseInt(date.substring(11, 13));
@@ -61,12 +63,15 @@ public class Prettifier {
                         offset = date.substring( date.length() -6, date.length());
                     }
 
-
-
-
                     String answer = hoursWithEnding + " " + "(" + offset + ")" ;
                     System.out.println(answer);
-                    FileWriter(answer);
+                    System.out.println(data);
+                    System.out.println(date);
+
+                    String output = data.replace(replaceable, answer);
+                    System.out.println(output);
+
+                    FileWriter(output);
 
 
 
@@ -74,6 +79,8 @@ public class Prettifier {
                 }else if (data.contains("T24") && !data.contains("D(")) {
                     int number =  data.indexOf("T24");
                     String date = data.substring(number +4, (data.length() - 1));
+                    String replaceable = data.substring(number, data.length());
+
                     date = date.trim();
 
                     // System.out.println(data);
@@ -96,14 +103,17 @@ public class Prettifier {
 
                     // System.out.println(hoursWithEnding);
 
-
                     String answer = hours + " " + "(" + offset + ")";
-                    System.out.println(answer);
-                    FileWriter(answer);
+                    String output = data.replace(replaceable, answer);
+
+
+                    FileWriter(output);
 
 
                 }else if(data.contains("D(")){
                     int number =  data.indexOf("D(");
+                    String replaceable = data.substring(number, data.length());
+
 
                     String date = data.substring(number +2, (data.length() - 1));
                     String day = date.substring(8, 10);
@@ -114,8 +124,9 @@ public class Prettifier {
 
 
                     String answer = day + " " + month + " " + year;
-                    System.out.println(answer);
-                    FileWriter(answer);
+                    String output = data.replace(replaceable, answer);
+
+                    FileWriter(output);
 
 
                 

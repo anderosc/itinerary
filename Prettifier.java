@@ -1,7 +1,9 @@
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -77,6 +79,7 @@ public class Prettifier {
 
     //loop through new array and manipulate data and replace it
 
+
         for(int i = 0; i < dataList.size(); i++){
             if(dataList.get(i).contains("T12") && !dataList.get(i).contains("D(") ){
                 dataList.set(i, T12(dataList.get(i)));
@@ -91,7 +94,8 @@ public class Prettifier {
                 dataList.set(i, null);
             }
         }
-        System.out.println(dataList);
+        
+        printFile(dataList);
     }
 
     public static String T12(String data){
@@ -275,6 +279,28 @@ public class Prettifier {
             }
         }
         return null;
+    }
+
+    public static void printFile(ArrayList printRows) {
+        if(airportLookupMalformed == true){
+            return;
+        }
+
+        try{
+
+        FileWriter fw = new FileWriter("output.txt", true);
+        BufferedWriter bw = new BufferedWriter(fw);
+        System.out.println(dataList);
+            for(int i = 0; i< dataList.size(); i++){
+            bw.write(dataList.get(i));
+            bw.newLine();
+            }
+            bw.close();
+            fw.close();
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+        
     }
 
   

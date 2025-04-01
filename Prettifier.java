@@ -24,7 +24,14 @@ public class Prettifier {
     public static void main(String[] args){
 
         //arguments
+        if(args.length > 0 && args[0].equals("-h")){
+            System.out.println("itinerary usage:");
+            System.out.println("java Prettifier.java ./input.txt ./output.txt ./airport-lookup.csv");
+            return;
+        }
+
         ArrayList<String> argsList = new ArrayList<String>();
+        
         for (String s: args){
             System.out.println(s);
             argsList.add(s);
@@ -52,15 +59,23 @@ public class Prettifier {
         } catch (FileNotFoundException e){
             System.out.println("errrrror");
         }
+        System.out.println(dataList.size());
+
+        System.out.println(dataList);
         
         //loop through elements to find empty ones and save it to arraylist
         for(int i = 0; i < dataList.size(); i++){
             if(dataList.get(i).equals("")){
-                System.out.println("its working");
+                System.out.println(dataList.size());
 
-                if(dataList.get(i+1).equals("")){
-                System.out.println("its working too");
+                if(i == 0){
+                    continue;
+                }
 
+                if(dataList.get(i-1).equals("")){
+                    emptyElements.add(i);
+                }
+                if(i == dataList.size() +1 && dataList.get(i -1).equals("")){
                     emptyElements.add(i);
                 }
             }else{
@@ -71,10 +86,13 @@ public class Prettifier {
 
         //check if there are some empty cells, if yes then loop though to remove them
         if(emptyElements.size() > 0){
-            for(int i = 0; i < emptyElements.size(); i++){
+            System.out.print(emptyElements);
+
+            for(int i = emptyElements.size() -1 ; i >= 0; i--){
                 int removeIt = emptyElements.get(i);
                 dataList.remove(removeIt);
             }
+
         }
 
     //loop through new array and manipulate data and replace it

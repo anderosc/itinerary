@@ -34,15 +34,21 @@ public class Prettifier {
         
         for (String s: args){
             argsList.add(s);
+
         }
+
         if(args.length < 3){
             return;
         }
-        if(!argsList.contains("./input.txt") || !argsList.contains("./output.txt") || !argsList.contains("./airports_lookup.csv")){
+
+
+        if(!argsList.contains("./input.txt") || !argsList.contains("./output.txt") || !argsList.contains("./airport-lookup.csv")){
             return;
         }
 
+
         setupAirpotLookup();
+
         //read every line and put it in arraylist
         try{
             File myObj = new File("input.txt");
@@ -58,6 +64,7 @@ public class Prettifier {
 
                 dataList.add(data);
             }
+
             myReader.close();
             
         } catch (FileNotFoundException e){
@@ -222,7 +229,6 @@ public class Prettifier {
         
         
         data = data.replace(firstAirportCode, firstanswer).replace(secondAirportCode, secondanswer);
-        System.out.println(data);
 
         return data;
     }
@@ -268,6 +274,7 @@ public class Prettifier {
     }
 
     public static void setupAirpotLookup(){
+
         String filePath = "airport-lookup.csv";
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String firstLine = br.readLine();

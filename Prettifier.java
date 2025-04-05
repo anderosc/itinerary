@@ -114,6 +114,7 @@ public class Prettifier {
                 dataList.set(i, Date(dataList.get(i)));
             }
             if(dataList.get(i).contains("#")){
+                //check if the previous symbol is * for city name:
                 dataList.set(i, airportCode(dataList.get(i)));
             }
         }

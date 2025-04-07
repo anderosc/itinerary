@@ -249,12 +249,12 @@ public class Prettifier {
 
                 for (String cell : row) {
                     if (cell.contains(searchTerm)) {
-                        if (row[airportLookUpNameIndex].contains("�")) {
-                            System.out.println("Airport lookup malformed");
-                            airportLookupMalformed = true;
-                            System.exit(0);
-                            break;
-                        }
+                        // if (row[airportLookUpNameIndex].contains("�")) {
+                        //     System.out.println("Airport lookup malformed");
+                        //     airportLookupMalformed = true;
+                        //     System.exit(0);
+                        //     break;
+                        // }
                         return row[airportLookUpNameIndex];
                     }
                 }

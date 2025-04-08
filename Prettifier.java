@@ -46,7 +46,6 @@ public class Prettifier {
             return;
         }
 
-
         setupAirpotLookup();
 
         //read every line and put it in arraylist
@@ -101,7 +100,6 @@ public class Prettifier {
         }
 
     //loop through new array and manipulate data and replace it
-
 
         for(int i = 0; i < dataList.size(); i++){
             if(dataList.get(i).contains("T12") && !dataList.get(i).contains("D(") ){
@@ -276,12 +274,18 @@ public class Prettifier {
 
     public static void setupAirpotLookup(){
 
+
         String filePath = "airport-lookup.csv";
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String firstLine = br.readLine();
             String[] values = firstLine.split(",");
             for(String value : values){
                 airportLookUpOrder.add(value.trim());
+            }
+            //Check if airport-lookup is malformed
+            if(airportLookUpOrder.size() > 6){
+                System.out.println("Airport lookup malformed");
+                System.exit(0);
             }
         } catch (IOException e) {
             e.printStackTrace();

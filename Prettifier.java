@@ -163,9 +163,9 @@ public class Prettifier {
     }
 
 
+
     public static String Date(String data){
         String[] Months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
-
 
         int number =  data.indexOf("D(");
         String replaceable = data.substring(number, data.length());
@@ -179,6 +179,7 @@ public class Prettifier {
         return data.replace(replaceable, answer);
     }
 
+
     public static String airportCode(String data){
         // IATA # followed by three letters
         //ICAO ## followed by four letters
@@ -191,18 +192,33 @@ public class Prettifier {
         String secondanswer = "";
 
         //lets find if first # is IATA or ICAO code
+
         if(data.charAt(firstHashtag +1 ) == '#'){
+
+           
             //ICAO
             firstAirportCode = data.substring(firstHashtag , firstHashtag + 6 );
             String firstAirportCodeWithOutH = firstAirportCode.substring(2, 6);
-            firstanswer =  readFile(firstAirportCodeWithOutH);
+            if(data.charAt(firstHashtag -1) == '*'){
+                System.out.println("heheh");
+                firstanswer = readFile(firstAirportCodeWithOutH, true);
+            }else{
+                firstanswer =  readFile(firstAirportCodeWithOutH, false);
 
+            }
+
+            System.out.println(firstanswer);
 
         } else {
-            // IATA
             firstAirportCode = data.substring(firstHashtag , firstHashtag + 4 );
             String firstAirportCodeWithOutH = firstAirportCode.substring(1, 4);
-            firstanswer =  readFile(firstAirportCodeWithOutH);
+            if(data.charAt(firstHashtag -1) == '*'){
+                System.out.println("heheh");
+                firstanswer = readFile(firstAirportCodeWithOutH, true);
+            }else{
+                firstanswer =  readFile(firstAirportCodeWithOutH, false);
+            }
+            // IATA
 
         }
        
@@ -212,7 +228,13 @@ public class Prettifier {
                 secondAirportCode = data.substring(secondhashtag , secondhashtag + 6 );
 
                 String secondAirportCodeWithOutH = secondAirportCode.substring(2, 6);
-                secondanswer =  readFile(secondAirportCodeWithOutH);
+                if(data.charAt(firstHashtag -1) == '*'){
+                    System.out.println("heheh");
+                    secondanswer = readFile(secondAirportCodeWithOutH, true);
+                }else{
+                    secondanswer =  readFile(secondAirportCodeWithOutH, false);
+    
+                }
                 // FileWriter(answers);
 
             } else {
@@ -221,11 +243,15 @@ public class Prettifier {
                 secondAirportCode = data.substring(secondhashtag , secondhashtag + 4 );
 
                 String secondAirportCodeWithOutH = secondAirportCode.substring(1, 4);
-                secondanswer = readFile(secondAirportCodeWithOutH);
+                if(data.charAt(firstHashtag -1) == '*'){
+                    System.out.println("heheh");
+                    secondanswer = readFile(secondAirportCodeWithOutH, true);
+                }else{
+                    secondanswer =  readFile(secondAirportCodeWithOutH, false);
+    
+                }
                 // FileWriter(answers);
-
             }
-        
         
         data = data.replace(firstAirportCode, firstanswer).replace(secondAirportCode, secondanswer);
 
@@ -233,7 +259,8 @@ public class Prettifier {
     }
 
 
-    public static String readFile(String searchTerm){
+
+    public static String readFile(String searchTerm, boolean isCityNameNeeded){
 
         String filepath = "airport-lookup.csv";
         BufferedReader reader = null;
@@ -247,12 +274,12 @@ public class Prettifier {
 
                 for (String cell : row) {
                     if (cell.contains(searchTerm)) {
-                        // if (row[airportLookUpNameIndex].contains("�")) {
-                        //     System.out.println("Airport lookup malformed");
-                        //     airportLookupMalformed = true;
-                        //     System.exit(0);
-                        //     break;
-                        // }
+                        if(isCityNameNeeded){
+                            int firstSpacePosition = row[airportLookUpNameIndex].indexOf(" ");
+                            String cityName = row[airportLookUpNameIndex].substring(0, firstSpacePosition);
+                            return cityName;
+                        }
+
                         return row[airportLookUpNameIndex];
                     }
                 }
@@ -274,11 +301,13 @@ public class Prettifier {
 
     public static void setupAirpotLookup(){
 
-
         String filePath = "airport-lookup.csv";
-        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))){
+
             String firstLine = br.readLine();
             String[] values = firstLine.split(",");
+
             for(String value : values){
                 airportLookUpOrder.add(value.trim());
             }
@@ -290,34 +319,29 @@ public class Prettifier {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         if(!airportLookUpOrder.contains("name")){
             System.exit(0);
         }
-        airportLookUpNameIndex = airportLookUpOrder.indexOf("name");
 
+        airportLookUpNameIndex = airportLookUpOrder.indexOf("name");
     }
 
     public static void printFile(ArrayList printRows) {
         if(airportLookupMalformed == true){
             return;
         }
-
         try{
         FileWriter fw = new FileWriter("output.txt", true);
         BufferedWriter bw = new BufferedWriter(fw);
-
             for(int i = 0; i< dataList.size(); i++){
                 bw.write(dataList.get(i));
                 bw.newLine();
             }
-
             bw.close();
             fw.close();
         }catch(IOException e){
             e.printStackTrace();
         }
-        
     }
-
-  
 }

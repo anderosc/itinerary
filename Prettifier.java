@@ -20,7 +20,9 @@ public class Prettifier {
     public static boolean airportLookupMalformed = false;
     public static ArrayList<String> airportLookUpOrder = new ArrayList<>();
     public static int airportLookUpNameIndex;
-    
+    public static int airportLookUpMunicipalityIndex;
+
+
     public static void main(String[] args){
 
         //arguments
@@ -34,13 +36,11 @@ public class Prettifier {
         
         for (String s: args){
             argsList.add(s);
-
         }
 
         if(args.length < 3){
             return;
         }
-
 
         if(!argsList.contains("./input.txt") || !argsList.contains("./output.txt") || !argsList.contains("./airport-lookup.csv")){
             return;
@@ -183,7 +183,6 @@ public class Prettifier {
     public static String airportCode(String data){
         // IATA # followed by three letters
         //ICAO ## followed by four letters
-
         int firstHashtag = data.indexOf("#");
         int secondhashtag = data.indexOf("#", firstHashtag + 2);
         String firstAirportCode = "";
@@ -191,20 +190,22 @@ public class Prettifier {
         String firstanswer = "";
         String secondanswer = "";
 
+
         //lets find if first # is IATA or ICAO code
 
         if(data.charAt(firstHashtag +1 ) == '#'){
 
-           
             //ICAO
+            //if its *airport code to city, then it hase to be firsthastag -1 to remove it.
             firstAirportCode = data.substring(firstHashtag , firstHashtag + 6 );
+            
             String firstAirportCodeWithOutH = firstAirportCode.substring(2, 6);
+
             if(data.charAt(firstHashtag -1) == '*'){
-                System.out.println("heheh");
+                firstAirportCode = firstAirportCode.substring(1);
                 firstanswer = readFile(firstAirportCodeWithOutH, true);
             }else{
                 firstanswer =  readFile(firstAirportCodeWithOutH, false);
-
             }
 
             System.out.println(firstanswer);
@@ -212,8 +213,10 @@ public class Prettifier {
         } else {
             firstAirportCode = data.substring(firstHashtag , firstHashtag + 4 );
             String firstAirportCodeWithOutH = firstAirportCode.substring(1, 4);
+
             if(data.charAt(firstHashtag -1) == '*'){
-                System.out.println("heheh");
+                firstAirportCode = firstAirportCode.substring(1);
+
                 firstanswer = readFile(firstAirportCodeWithOutH, true);
             }else{
                 firstanswer =  readFile(firstAirportCodeWithOutH, false);
@@ -221,7 +224,7 @@ public class Prettifier {
             // IATA
 
         }
-       
+
         // and second #
             if(data.charAt(secondhashtag +1 ) == '#'){
                 //ICAO
@@ -229,7 +232,6 @@ public class Prettifier {
 
                 String secondAirportCodeWithOutH = secondAirportCode.substring(2, 6);
                 if(data.charAt(firstHashtag -1) == '*'){
-                    System.out.println("heheh");
                     secondanswer = readFile(secondAirportCodeWithOutH, true);
                 }else{
                     secondanswer =  readFile(secondAirportCodeWithOutH, false);
@@ -244,22 +246,19 @@ public class Prettifier {
 
                 String secondAirportCodeWithOutH = secondAirportCode.substring(1, 4);
                 if(data.charAt(firstHashtag -1) == '*'){
-                    System.out.println("heheh");
                     secondanswer = readFile(secondAirportCodeWithOutH, true);
                 }else{
                     secondanswer =  readFile(secondAirportCodeWithOutH, false);
-    
                 }
                 // FileWriter(answers);
             }
-        
-        data = data.replace(firstAirportCode, firstanswer).replace(secondAirportCode, secondanswer);
+        System.out.println(firstAirportCode);
 
+        data = data.replace(firstAirportCode, firstanswer).replace(secondAirportCode, secondanswer).replace("*", "");
         return data;
     }
 
-
-
+    
     public static String readFile(String searchTerm, boolean isCityNameNeeded){
 
         String filepath = "airport-lookup.csv";
@@ -275,9 +274,7 @@ public class Prettifier {
                 for (String cell : row) {
                     if (cell.contains(searchTerm)) {
                         if(isCityNameNeeded){
-                            int firstSpacePosition = row[airportLookUpNameIndex].indexOf(" ");
-                            String cityName = row[airportLookUpNameIndex].substring(0, firstSpacePosition);
-                            return cityName;
+                            return row[airportLookUpMunicipalityIndex];
                         }
 
                         return row[airportLookUpNameIndex];
@@ -325,6 +322,7 @@ public class Prettifier {
         }
 
         airportLookUpNameIndex = airportLookUpOrder.indexOf("name");
+        airportLookUpMunicipalityIndex = airportLookUpOrder.indexOf("municipality");
     }
 
     public static void printFile(ArrayList printRows) {

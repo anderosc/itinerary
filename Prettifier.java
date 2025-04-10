@@ -70,7 +70,6 @@ public class Prettifier {
             System.out.println("errrrror");
         }
 
-        
         //loop through elements to find empty ones and save it to arraylist
         for(int i = 0; i < dataList.size(); i++){
             if(dataList.get(i).equals("")){

@@ -8,7 +8,10 @@ import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Prettifier {
 
@@ -74,7 +77,6 @@ public class Prettifier {
         for(int i = 0; i < dataList.size(); i++){
             if(dataList.get(i).equals("")){
 
-
                 if(i == 0){
                     continue;
                 }
@@ -82,6 +84,7 @@ public class Prettifier {
                 if(dataList.get(i-1).equals("")){
                     emptyElements.add(i);
                 }
+
                 if(i == dataList.size() +1 && dataList.get(i -1).equals("")){
                     emptyElements.add(i);
                 }
@@ -98,6 +101,11 @@ public class Prettifier {
 
         }
 
+        //TEST
+        Test();
+
+        
+        
     //loop through new array and manipulate data and replace it
 
         for(int i = 0; i < dataList.size(); i++){
@@ -108,7 +116,7 @@ public class Prettifier {
                 dataList.set(i, T24(dataList.get(i)));
             }
             if(dataList.get(i).contains("D(")){
-                dataList.set(i, Date(dataList.get(i)));
+                dataList.set(i, handleDate(dataList.get(i)));
             }
             if(dataList.get(i).contains("#")){
                 //check if the previous symbol is * for city name:
@@ -163,7 +171,7 @@ public class Prettifier {
 
 
 
-    public static String Date(String data){
+    public static String handleDate(String data){
         String[] Months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
 
         int number =  data.indexOf("D(");
@@ -340,5 +348,58 @@ public class Prettifier {
         }catch(IOException e){
             e.printStackTrace();
         }
+    }
+
+    public static ArrayList<String> Test() {
+        ArrayList<String> processedLines = new ArrayList<>();
+    
+        Pattern dPattern = Pattern.compile("D\\(([^)]+)\\)");
+        Pattern t12Pattern = Pattern.compile("T12\\(([^)]+)\\)");
+        Pattern t24Pattern = Pattern.compile("T24\\(([^)]+)\\)");
+        Pattern iataPattern = Pattern.compile("(?<!#)#([A-Z]{3})(?![A-Z])");
+        Pattern icaoPattern = Pattern.compile("##([A-Z]{4})(?![A-Z])");
+    
+        for (String line : dataList) {
+
+            Matcher dMatcher = dPattern.matcher(line);
+            while (dMatcher.find()) {
+                String original = dMatcher.group(0);
+                String manipulated = handleDate(original);
+                line = line.replace(original, manipulated);
+            }
+    
+            Matcher t12Matcher = t12Pattern.matcher(line);
+            while (t12Matcher.find()) {
+                String original = t12Matcher.group(0);
+                String manipulated = T12(original);
+                line = line.replace(original, manipulated);
+            }
+
+            Matcher t24Matcher = t24Pattern.matcher(line);
+            while (t24Matcher.find()) {
+                String original = t24Matcher.group(0);
+                String manipulated = T24(original);
+                line = line.replace(original, manipulated);
+            }
+
+            Matcher iataMatcher = iataPattern.matcher(line);
+            while (iataMatcher.find()) {
+                String original = iataMatcher.group(0);
+                String code = iataMatcher.group(1);
+                String manipulated = airportCode(code);
+                line = line.replace(original, manipulated);
+            }
+    
+            Matcher icaoMatcher = icaoPattern.matcher(line);
+            while (icaoMatcher.find()) {
+                String original = icaoMatcher.group(0);
+                String code = icaoMatcher.group(1);
+                String manipulated = airportCode(code);
+                line = line.replace(original, manipulated);
+            }
+            processedLines.add(line);
+        }
+        System.out.println(processedLines);
+        return processedLines;
     }
 }

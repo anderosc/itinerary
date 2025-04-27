@@ -14,6 +14,8 @@ public class Prettifier {
     public static ArrayList<String> airportLookUpOrder = new ArrayList<>();
     public static int airportLookUpNameIndex;
     public static int airportLookUpMunicipalityIndex;
+    public static int airportLookUpIcaoCodeIndex;
+    public static int airportLookUpIataCodeIndex;
 
     public static String inputFile;
     public static String outputFile;
@@ -86,7 +88,7 @@ public class Prettifier {
             for (String value : values) {
                 airportLookUpOrder.add(value.trim());
             }
-            if (airportLookUpOrder.size() > 6 || !airportLookUpOrder.contains("name")) {
+            if (airportLookUpOrder.size() < 6 || !airportLookUpOrder.contains("name")) {
                 System.out.println("Airport lookup malformed");
                 System.exit(0);
             }
@@ -94,10 +96,13 @@ public class Prettifier {
             System.out.println("Error reading lookup file");
             System.exit(0);
         }
-
+    
         airportLookUpNameIndex = airportLookUpOrder.indexOf("name");
         airportLookUpMunicipalityIndex = airportLookUpOrder.indexOf("municipality");
+        airportLookUpIcaoCodeIndex = airportLookUpOrder.indexOf("icao_code");
+        airportLookUpIataCodeIndex = airportLookUpOrder.indexOf("iata_code");
     }
+    
 
     public static ArrayList<String> Test() {
         ArrayList<String> processedLines = new ArrayList<>();
@@ -151,28 +156,45 @@ public class Prettifier {
 
     public static String T12(String data) {
         int number = data.indexOf("T12");
-        String dateTime = data.substring(number + 4, data.length() - 1);
-        if (dateTime.endsWith("Z")) {
-            dateTime = dateTime.substring(0, dateTime.length() - 1) + "+00:00";
-        }
-        ZonedDateTime zdt = ZonedDateTime.parse(dateTime);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mma (XXX)");
-        return data.substring(0, number) + zdt.format(formatter);
-    }
-    
-    
-    
-    
-
-    public static String T24(String data) {
-        int number = data.indexOf("T24");
         String date = data.substring(number + 4, data.length() - 1);
+        String replaceableDate = data.substring(number, data.length());
+    
         if (date.endsWith("Z")) {
             date = date.substring(0, date.length() - 1) + "+00:00";
         }
+    
+        ZonedDateTime zdt = ZonedDateTime.parse(date);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a (XXX)");
+        String formattedDate = zdt.format(formatter);
+        
+        if(formattedDate.contains("(Z)")){
+            formattedDate = formattedDate.replace("(Z)", "(+00:00)");
+        }
+    
+       // System.out.println(formattedDate);
+    
+        return data.replace(replaceableDate, formattedDate);
+    }
+    
+    public static String T24(String data) {
+        int number = data.indexOf("T24");
+        String date = data.substring(number + 4, data.length() - 1);
+        String replaceable = data.substring(number, data.length());
+        date = date.trim();
+    
+        if (date.endsWith("Z")) {
+            date = date.substring(0, date.length() - 1) + "+00:00";
+        }
+    
         ZonedDateTime zdt = ZonedDateTime.parse(date);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm (XXX)");
-        return zdt.format(formatter);
+        String formattedDate = zdt.format(formatter);
+    
+        if(formattedDate.contains("(Z)")){
+            formattedDate = formattedDate.replace("(Z)", "(+00:00)");
+        }
+    
+        return data.replace(replaceable, formattedDate);
     }
 
     public static String handleDate(String data) {
@@ -192,15 +214,18 @@ public class Prettifier {
         String searchCode = code.replace("#", "").toUpperCase();
         lookupFile = "airport-lookup.csv";
         try (BufferedReader reader = new BufferedReader(new FileReader(lookupFile))) {
+            reader.readLine(); // skip header line
             String line;
             while ((line = reader.readLine()) != null) {
-                String[] row = line.split(",");
-                if (row.length < 3) {
+                String[] row = line.split(",", -1);
+                if (row.length < airportLookUpOrder.size()) {
                     continue;
                 }
-
-                String ident;
-                if (ident.equals(searchCode)) {
+    
+                String icao = row[airportLookUpIcaoCodeIndex].trim().toUpperCase();
+                String iata = row[airportLookUpIataCodeIndex].trim().toUpperCase();
+    
+                if (searchCode.equals(icao) || searchCode.equals(iata)) {
                     if (isCityNameNeeded) {
                         return row[airportLookUpMunicipalityIndex];
                     } else {
@@ -213,6 +238,7 @@ public class Prettifier {
         }
         return null;
     }
+    
 
     public static void printFile(ArrayList<String> printRows) {
         if (airportLookupMalformed) {

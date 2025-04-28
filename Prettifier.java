@@ -24,8 +24,8 @@ public class Prettifier {
     public static void main(String[] args) {
 
         if (args.length == 1 && args[0].equals("-h")) {
-            System.out.println("Usage:");
-            System.out.println("java Prettifier input.txt output.txt airport-lookup.csv");
+            System.out.println("itinerary usage:");
+            System.out.println("java Prettifier /input.txt /output.txt /airport-lookup.csv");
             return;
         }
 
@@ -54,7 +54,6 @@ public class Prettifier {
             }
             myReader.close();
         } catch (FileNotFoundException e) {
-            System.out.println("Error reading input file");
             return;
         }
 
@@ -82,6 +81,12 @@ public class Prettifier {
     }
 
     public static void setupAirpotLookup() {
+        File myObj = new File("airport-lookup.csv");
+        if(!myObj.exists()){
+            System.out.println("Airport lookup not found");
+            System.exit(0);
+        }
+        
         try (BufferedReader br = new BufferedReader(new FileReader(lookupFile))) {
             String firstLine = br.readLine();
             String[] values = firstLine.split(",");

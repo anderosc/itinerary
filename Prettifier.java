@@ -8,25 +8,18 @@ import java.util.regex.Pattern;
 public class Prettifier {
 
     public static ArrayList<String> dataList = new ArrayList<String>();
-    public static ArrayList<Integer> emptyElements = new ArrayList<Integer>();
 
-    public static boolean airportLookupMalformed = false;
     public static ArrayList<String> airportLookUpOrder = new ArrayList<>();
     public static int airportLookUpNameIndex;
     public static int airportLookUpMunicipalityIndex;
     public static int airportLookUpIcaoCodeIndex;
     public static int airportLookUpIataCodeIndex;
-    public static int airportLookUpCoordinatesIndex;
-
 
     public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_GREEN = "\u001B[32m";
     public static final String ANSI_RED = "\u001B[31m";
     public static final String ANSI_YELLOW_BACKGROUND = "\u001B[43m";
     public static final String ANSI_BLACK_BACKGROUND = "\u001B[40m";
-    public static final String BOLD = "\033[0;1m";
-
-
 
     public static void main(String[] args) {
 
@@ -44,7 +37,7 @@ public class Prettifier {
         }
 
         // Check if the airport lookup is malformed
-        setupAirpotLookup(args[2]);
+        setupAirportLookup(args[2]);
 
         // Read input file
         try {
@@ -111,8 +104,8 @@ public class Prettifier {
 
 
     // Check if airport lookup is malformed
-    public static void setupAirpotLookup(String input) {
-        File myObj = new File(input);
+    public static void setupAirportLookup(String airportLookUpLocation) {
+        File myObj = new File(airportLookUpLocation);
         Integer headerCount = 0;
         String[] values;
         if(!myObj.exists()){
@@ -121,7 +114,7 @@ public class Prettifier {
         }
 
         // Count the headers and save to variables
-        try (BufferedReader br = new BufferedReader(new FileReader(input))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(airportLookUpLocation))) {
             String firstLine = br.readLine();
             values = firstLine.split(",");
             headerCount = values.length;
@@ -141,10 +134,9 @@ public class Prettifier {
         airportLookUpMunicipalityIndex = airportLookUpOrder.indexOf("municipality");
         airportLookUpIcaoCodeIndex = airportLookUpOrder.indexOf("icao_code");
         airportLookUpIataCodeIndex = airportLookUpOrder.indexOf("iata_code");
-        airportLookUpCoordinatesIndex = airportLookUpOrder.indexOf("coordinates");
 
         // Check if every line has its all elements
-        try (BufferedReader reader = new BufferedReader(new FileReader(input))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(airportLookUpLocation))) {
             reader.readLine();
             String line;
 
@@ -337,9 +329,6 @@ public class Prettifier {
 
     //Print to output
     public static void printFile(ArrayList<String> printRows) {
-        if (airportLookupMalformed) {
-            return;
-        }
         try {
             FileWriter fw = new FileWriter("output.txt"); // append = false
             BufferedWriter bw = new BufferedWriter(fw);

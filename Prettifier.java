@@ -16,6 +16,7 @@ public class Prettifier {
     public static int airportLookUpMunicipalityIndex;
     public static int airportLookUpIcaoCodeIndex;
     public static int airportLookUpIataCodeIndex;
+    public static int airportLookUpCoordinatesIndex;
 
 
     public static final String ANSI_RESET = "\u001B[0m";
@@ -35,18 +36,19 @@ public class Prettifier {
             return;
         }
 
+        // Check if all the args are present
         if (args.length < 3) {
-            System.out.println( ANSI_RED + ANSI_YELLOW_BACKGROUND + "Error: Please provide input file, output file, and lookup file." + "\n" 
-            + "java Prettifier.java /input.txt /output.txt /airport-lookup.csv" + ANSI_RESET + ANSI_BLACK_BACKGROUND);
+            System.out.println(ANSI_GREEN + "itinerary usage:"+  ANSI_RESET);
+            System.out.println(ANSI_GREEN + "java Prettifier.java ./input.txt ./output.txt ./airport-lookup.csv" + ANSI_RESET) ;
             return;
         }
 
+        // Check if the airport lookup is malformed
+        setupAirpotLookup(args[2]);
 
-        setupAirpotLookup();
-
-        // read input file
+        // Read input file
         try {
-            File myObj = new File("input.txt");
+            File myObj = new File(args[0]);
             if (!myObj.exists()) {
                 System.out.println(ANSI_RED + "Input not found" + ANSI_RESET);
                 return;
@@ -61,39 +63,68 @@ public class Prettifier {
             return;
         }
 
-        // remove extra empty lines
-        for (int i = 0; i < dataList.size(); i++) {
-            if (dataList.get(i).equals("")) {
-                if (i == 0) continue;
-                if (dataList.get(i - 1).equals("")) {
-                    emptyElements.add(i);
+
+        // Find \f, \v, \r, \n and add empty lines
+        for (int i = (dataList.size() - 1); i > 0; i--) {
+            
+            String line = dataList.get(i);
+
+            // Match the pattern
+            Matcher matcher = Pattern.compile("\\\\[fvrn]").matcher(line);
+            int matchCount = 0;
+        
+            while (matcher.find()) {
+                matchCount++;
+            }
+        
+            // If found, replace the pattern and add empty lines
+            if (matchCount > 0) {
+                dataList.set(i, line.replaceAll("\\\\[fvrn]", "\n"));
+            
+                // Only add an empty line if the next line is not already empty
+                if (i + 1 >= dataList.size() || !dataList.get(i + 1).trim().isEmpty()) {
+                    dataList.add(i + 1, "");
                 }
             }
+            // Trim and clean up empty lines
+            String trimmed = dataList.get(i).trim();
+            dataList.set(i, trimmed);
         }
-        if (emptyElements.size() > 0) {
-            for (int i = emptyElements.size() - 1; i >= 0; i--) {
-                int removeIt = emptyElements.get(i);
-                dataList.remove(removeIt);
+
+        // Check for empty lines and remove
+        for (int i = dataList.size() - 1; i > 0; i--) {
+            String current = dataList.get(i).trim();
+            String previous = dataList.get(i - 1).trim();
+        
+            if (current.isEmpty() && previous.isEmpty()) {
+                dataList.remove(i); // Remove the current line
             }
         }
+        
+        // Find patterns inside the lines that need to be manipulated
+        dataList = Patterns();  
 
-        dataList = Patterns();
-
+        //Print the output to finish program flow
         printFile(dataList);
     }
 
 
 
-    public static void setupAirpotLookup() {
-        File myObj = new File("airport-lookup.csv");
+    // Check if airport lookup is malformed
+    public static void setupAirpotLookup(String input) {
+        File myObj = new File(input);
+        Integer headerCount = 0;
+        String[] values;
         if(!myObj.exists()){
             System.out.println(ANSI_RED + "Airport lookup not found" + ANSI_RESET);
             System.exit(0);
         }
 
-        try (BufferedReader br = new BufferedReader(new FileReader("airport-lookup.csv"))) {
+        // Count the headers and save to variables
+        try (BufferedReader br = new BufferedReader(new FileReader(input))) {
             String firstLine = br.readLine();
-            String[] values = firstLine.split(",");
+            values = firstLine.split(",");
+            headerCount = values.length;
             for (String value : values) {
                 airportLookUpOrder.add(value.trim());
             }
@@ -105,15 +136,59 @@ public class Prettifier {
             System.out.println(ANSI_RED + "Error reading lookup file" + ANSI_RESET);
             System.exit(0);
         }
+
         airportLookUpNameIndex = airportLookUpOrder.indexOf("name");
         airportLookUpMunicipalityIndex = airportLookUpOrder.indexOf("municipality");
         airportLookUpIcaoCodeIndex = airportLookUpOrder.indexOf("icao_code");
         airportLookUpIataCodeIndex = airportLookUpOrder.indexOf("iata_code");
+        airportLookUpCoordinatesIndex = airportLookUpOrder.indexOf("coordinates");
+
+        // Check if every line has its all elements
+        try (BufferedReader reader = new BufferedReader(new FileReader(input))) {
+            reader.readLine();
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+
+                Pattern pattern = Pattern.compile("\"([^\"]*)\"");
+                Matcher matcher = pattern.matcher(line);
+                StringBuffer cleanedLine = new StringBuffer();
+
+                while (matcher.find()) {
+                    String cleanedGroup = matcher.group(1).replace(",", ""); // eemalda kõik komad jutumärkide seest
+                    matcher.appendReplacement(cleanedLine, cleanedGroup);
+                }
+                matcher.appendTail(cleanedLine);
+
+                line = cleanedLine.toString();
+
+
+                String[] row = line.split(",");
+
+                if (row.length != headerCount) {
+                    System.out.println(ANSI_RED + "Airport lookup malformed" + ANSI_RESET);
+                    System.exit(0);
+                }
+
+                for(int i = 0; i < row.length; i++){
+                    if(row[i].trim().isEmpty()){
+                    System.out.println(ANSI_RED + "Airport lookup malformed" + ANSI_RESET);
+
+                    System.exit(0);
+                    }
+                }
+
+
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
     
 
 
-
+    // Find date, time or airport patterns and invoke functions to change them customer friendly.
     public static ArrayList<String> Patterns() {
         ArrayList<String> processedLines = new ArrayList<>();
 
@@ -123,9 +198,6 @@ public class Prettifier {
         Pattern airportPattern = Pattern.compile("(\\*?)#(#?)([A-Z]{3,4})");
 
         for (String line : dataList) {
-
-            line = line.replaceAll("\\\\[fvr]", "\n");
-
 
             Matcher dMatcher = dPattern.matcher(line);
             while (dMatcher.find()) {
@@ -168,7 +240,7 @@ public class Prettifier {
     }
 
 
-
+    // TIME T12
     public static String T12(String data) {
         int number = data.indexOf("T12");
         String date = data.substring(number + 4, data.length() - 1);
@@ -192,7 +264,7 @@ public class Prettifier {
     }
     
 
-
+    //TIME T24
     public static String T24(String data) {
         int number = data.indexOf("T24");
         String date = data.substring(number + 4, data.length() - 1);
@@ -215,7 +287,7 @@ public class Prettifier {
     }
 
 
-
+    //Dates
     public static String handleDate(String data) {
         String[] months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
                 "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
@@ -229,14 +301,15 @@ public class Prettifier {
 
     
 
-    
+    //Airport code to airport or city name
     public static String airportCode(String code, boolean isCityNameNeeded) {
         String searchCode = code.replace("#", "").toUpperCase();
         try (BufferedReader reader = new BufferedReader(new FileReader("airport-lookup.csv"))) {
             reader.readLine(); // skip header line
             String line;
             while ((line = reader.readLine()) != null) {
-                line = line.replaceAll("\"([^\"]*)\"", "");  // Remove quotes and commas inside quotes
+                line = line.replaceAll("\"([^\"]+),\\s*([^\"]+)\"", "\"$1 $2\"");
+
 
                 String[] row = line.split(",", -1);
                 if (row.length < airportLookUpOrder.size()) {
@@ -253,6 +326,7 @@ public class Prettifier {
                         return row[airportLookUpNameIndex];
                     }
                 }
+
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -261,6 +335,7 @@ public class Prettifier {
     }
     
 
+    //Print to output
     public static void printFile(ArrayList<String> printRows) {
         if (airportLookupMalformed) {
             return;

@@ -36,7 +36,8 @@ public class Prettifier {
         }
 
         if (args.length < 3) {
-            System.out.println( ANSI_RED + ANSI_YELLOW_BACKGROUND + "Error: Please provide input file, output file, and lookup file." + ANSI_RESET + ANSI_BLACK_BACKGROUND);
+            System.out.println( ANSI_RED + ANSI_YELLOW_BACKGROUND + "Error: Please provide input file, output file, and lookup file." + "\n" 
+            + "java Prettifier.java /input.txt /output.txt /airport-lookup.csv" + ANSI_RESET + ANSI_BLACK_BACKGROUND);
             return;
         }
 
@@ -227,7 +228,7 @@ public class Prettifier {
     }
 
     
-    
+
     
     public static String airportCode(String code, boolean isCityNameNeeded) {
         String searchCode = code.replace("#", "").toUpperCase();

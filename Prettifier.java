@@ -27,7 +27,6 @@ public class Prettifier {
 
 
 
-
     public static void main(String[] args) {
 
         if (args.length == 1 && args[0].equals("-h")) {
@@ -82,6 +81,8 @@ public class Prettifier {
         printFile(dataList);
     }
 
+
+
     public static void setupAirpotLookup() {
         File myObj = new File("airport-lookup.csv");
         if(!myObj.exists()){
@@ -109,6 +110,8 @@ public class Prettifier {
         airportLookUpIataCodeIndex = airportLookUpOrder.indexOf("iata_code");
     }
     
+
+
 
     public static ArrayList<String> Patterns() {
         ArrayList<String> processedLines = new ArrayList<>();
@@ -163,6 +166,8 @@ public class Prettifier {
         return processedLines;
     }
 
+
+
     public static String T12(String data) {
         int number = data.indexOf("T12");
         String date = data.substring(number + 4, data.length() - 1);
@@ -185,6 +190,8 @@ public class Prettifier {
         return data.replace(replaceableDate, formattedDate);
     }
     
+
+
     public static String T24(String data) {
         int number = data.indexOf("T24");
         String date = data.substring(number + 4, data.length() - 1);
@@ -206,6 +213,8 @@ public class Prettifier {
         return data.replace(replaceable, formattedDate);
     }
 
+
+
     public static String handleDate(String data) {
         String[] months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
                 "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
@@ -217,6 +226,7 @@ public class Prettifier {
         return day + " " + month + " " + year;
     }
 
+    
     
     
     public static String airportCode(String code, boolean isCityNameNeeded) {

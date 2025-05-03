@@ -103,7 +103,6 @@ public class Prettifier {
             System.out.println(ANSI_RED + "Error reading lookup file" + ANSI_RESET);
             System.exit(0);
         }
-        System.out.println(airportLookUpOrder);
         airportLookUpNameIndex = airportLookUpOrder.indexOf("name");
         airportLookUpMunicipalityIndex = airportLookUpOrder.indexOf("municipality");
         airportLookUpIcaoCodeIndex = airportLookUpOrder.indexOf("icao_code");

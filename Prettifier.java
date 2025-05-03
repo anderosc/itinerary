@@ -31,7 +31,7 @@ public class Prettifier {
 
         if (args.length == 1 && args[0].equals("-h")) {
             System.out.println(ANSI_GREEN + "itinerary usage:"+  ANSI_RESET);
-            System.out.println(ANSI_GREEN + "java Prettifier.java /input.txt /output.txt /airport-lookup.csv" + ANSI_RESET) ;
+            System.out.println(ANSI_GREEN + "java Prettifier.java ./input.txt ./output.txt ./airport-lookup.csv" + ANSI_RESET) ;
             return;
         }
 

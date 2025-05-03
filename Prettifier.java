@@ -17,34 +17,38 @@ public class Prettifier {
     public static int airportLookUpIcaoCodeIndex;
     public static int airportLookUpIataCodeIndex;
 
-    public static String inputFile;
-    public static String outputFile;
-    public static String lookupFile;
+
+    public static final String ANSI_RESET = "\u001B[0m";
+    public static final String ANSI_GREEN = "\u001B[32m";
+    public static final String ANSI_RED = "\u001B[31m";
+    public static final String ANSI_YELLOW_BACKGROUND = "\u001B[43m";
+    public static final String ANSI_BLACK_BACKGROUND = "\u001B[40m";
+    public static final String BOLD = "\033[0;1m";
+
+
+
 
     public static void main(String[] args) {
 
         if (args.length == 1 && args[0].equals("-h")) {
-            System.out.println("itinerary usage:");
-            System.out.println("java Prettifier /input.txt /output.txt /airport-lookup.csv");
+            System.out.println(ANSI_GREEN + "itinerary usage:"+  ANSI_RESET);
+            System.out.println(ANSI_GREEN + "java Prettifier.java /input.txt /output.txt /airport-lookup.csv" + ANSI_RESET) ;
             return;
         }
 
-        if (args.length != 3) {
-            System.out.println("Error: Please provide input file, output file, and lookup file.");
+        if (args.length < 3) {
+            System.out.println( ANSI_RED + ANSI_YELLOW_BACKGROUND + "Error: Please provide input file, output file, and lookup file." + ANSI_RESET + ANSI_BLACK_BACKGROUND);
             return;
         }
 
-        inputFile = args[0];
-        outputFile = args[1];
-        lookupFile = args[2];
 
         setupAirpotLookup();
 
         // read input file
         try {
-            File myObj = new File(inputFile);
+            File myObj = new File("input.txt");
             if (!myObj.exists()) {
-                System.out.println("Input not found");
+                System.out.println(ANSI_RED + "Input not found" + ANSI_RESET);
                 return;
             }
             Scanner myReader = new Scanner(myObj);
@@ -73,35 +77,33 @@ public class Prettifier {
             }
         }
 
-        // process text
-        dataList = Test();
+        dataList = Patterns();
 
-        // print to output file
         printFile(dataList);
     }
 
     public static void setupAirpotLookup() {
         File myObj = new File("airport-lookup.csv");
         if(!myObj.exists()){
-            System.out.println("Airport lookup not found");
+            System.out.println(ANSI_RED + "Airport lookup not found" + ANSI_RESET);
             System.exit(0);
         }
-        
-        try (BufferedReader br = new BufferedReader(new FileReader(lookupFile))) {
+
+        try (BufferedReader br = new BufferedReader(new FileReader("airport-lookup.csv"))) {
             String firstLine = br.readLine();
             String[] values = firstLine.split(",");
             for (String value : values) {
                 airportLookUpOrder.add(value.trim());
             }
             if (airportLookUpOrder.size() < 6 || !airportLookUpOrder.contains("name")) {
-                System.out.println("Airport lookup malformed");
+                System.out.println(ANSI_RED + "Airport lookup malformed" + ANSI_RESET);
                 System.exit(0);
             }
         } catch (IOException e) {
-            System.out.println("Error reading lookup file");
+            System.out.println(ANSI_RED + "Error reading lookup file" + ANSI_RESET);
             System.exit(0);
         }
-    
+        System.out.println(airportLookUpOrder);
         airportLookUpNameIndex = airportLookUpOrder.indexOf("name");
         airportLookUpMunicipalityIndex = airportLookUpOrder.indexOf("municipality");
         airportLookUpIcaoCodeIndex = airportLookUpOrder.indexOf("icao_code");
@@ -109,7 +111,7 @@ public class Prettifier {
     }
     
 
-    public static ArrayList<String> Test() {
+    public static ArrayList<String> Patterns() {
         ArrayList<String> processedLines = new ArrayList<>();
 
         Pattern dPattern = Pattern.compile("D\\(([^)]+)\\)");
@@ -118,6 +120,9 @@ public class Prettifier {
         Pattern airportPattern = Pattern.compile("(\\*?)#(#?)([A-Z]{3,4})");
 
         for (String line : dataList) {
+
+            line = line.replaceAll("\\\\[fvr]", "\n");
+
 
             Matcher dMatcher = dPattern.matcher(line);
             while (dMatcher.find()) {
@@ -217,11 +222,12 @@ public class Prettifier {
     
     public static String airportCode(String code, boolean isCityNameNeeded) {
         String searchCode = code.replace("#", "").toUpperCase();
-        lookupFile = "airport-lookup.csv";
-        try (BufferedReader reader = new BufferedReader(new FileReader(lookupFile))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("airport-lookup.csv"))) {
             reader.readLine(); // skip header line
             String line;
             while ((line = reader.readLine()) != null) {
+                line = line.replaceAll("\"([^\"]*)\"", "");  // Remove quotes and commas inside quotes
+
                 String[] row = line.split(",", -1);
                 if (row.length < airportLookUpOrder.size()) {
                     continue;
@@ -250,7 +256,7 @@ public class Prettifier {
             return;
         }
         try {
-            FileWriter fw = new FileWriter(outputFile, true); // append = true
+            FileWriter fw = new FileWriter("output.txt"); // append = false
             BufferedWriter bw = new BufferedWriter(fw);
             for (String line : printRows) {
                 bw.write(line);
@@ -260,5 +266,9 @@ public class Prettifier {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        System.out.print(ANSI_YELLOW_BACKGROUND + ANSI_GREEN + "\n"
+        + "\n" + " --- > The program ran successfully < --- \n" + 
+        " --- > output.txt updated! < --- \n" + 
+         "" + ANSI_BLACK_BACKGROUND + ANSI_RESET + "\n");
     }
 }
